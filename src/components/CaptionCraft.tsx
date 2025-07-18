@@ -546,7 +546,7 @@ return (
                       id="coreIdea"
                       placeholder="Enter your raw thoughts, keywords, or basic draft for the post... 
 
-Example: 'I'm launching a productivity app that helps remote workers stay focused. It has features like time blocking, distraction blocking, and team collaboration tools. I want to target young professionals who work from home.'"
+Example: 'I am launching a productivity app that helps remote workers stay focused. It has features like time blocking, distraction blocking, and team collaboration tools. I want to target young professionals who work from home.'"
                       value={state.coreIdea}
                       onChange={(e) => setState(prev => ({ ...prev, coreIdea: e.target.value }))}
                       rows={8}
@@ -567,31 +567,60 @@ Example: 'I'm launching a productivity app that helps remote workers stay focuse
             </Card>
 
             {/* Media Upload */}
-            <Card className="step-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Image className="w-5 h-5" />
-                  Media Context (Optional)
+            <Card className="step-card group hover:shadow-glow transition-all duration-300 border-primary/20">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-lg">
+                  <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                    <Image className="w-5 h-5 text-primary" />
+                  </div>
+                  Media Context
+                  <div className="ml-auto px-3 py-1 bg-secondary text-secondary-foreground text-xs font-semibold rounded-full">
+                    OPTIONAL
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div
-                    className="upload-zone"
+                    className={`upload-zone relative overflow-hidden group/upload transition-all duration-300 ${
+                      state.mediaFiles.length > 0 ? 'upload-zone-active border-success' : ''
+                    }`}
                     onClick={() => fileInputRef.current?.click()}
                   >
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                      <Image className="w-8 h-8 text-muted-foreground" />
-                      <Video className="w-8 h-8 text-muted-foreground" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover/upload:opacity-100 transition-opacity" />
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-center gap-3 mb-4">
+                        {state.mediaFiles.length > 0 ? (
+                          <Check className="w-12 h-12 text-success" />
+                        ) : (
+                          <>
+                            <div className="p-3 bg-primary/10 rounded-full">
+                              <Image className="w-8 h-8 text-primary" />
+                            </div>
+                            <div className="p-3 bg-accent/10 rounded-full">
+                              <Video className="w-8 h-8 text-accent" />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                      <p className="text-lg font-semibold mb-2">
+                        {state.mediaFiles.length > 0 
+                          ? `${state.mediaFiles.length} Files Uploaded!` 
+                          : 'Upload Visual Context'
+                        }
+                      </p>
+                      <p className="text-sm text-muted-foreground mb-6">
+                        Add up to 5 images or 1 video to provide visual context (Max 10MB each)
+                      </p>
+                      <Button 
+                        variant={state.mediaFiles.length > 0 ? "default" : "outline"} 
+                        size="sm" 
+                        className="shadow-md"
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        {state.mediaFiles.length > 0 ? 'Change Files' : 'Choose Files'}
+                      </Button>
                     </div>
-                    <p className="text-lg font-medium mb-2">Upload Visual Context</p>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Add up to 5 images or 1 video to provide visual context (Max 10MB each)
-                    </p>
-                    <Button variant="outline" size="sm">
-                      <Upload className="w-4 h-4 mr-2" />
-                      Choose Files
-                    </Button>
                   </div>
                   <input
                     ref={fileInputRef}
@@ -602,25 +631,38 @@ Example: 'I'm launching a productivity app that helps remote workers stay focuse
                     className="hidden"
                   />
                   {state.mediaFiles.length > 0 && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 animate-slide-up">
                       {state.mediaFiles.map((file, index) => (
                         <div key={index} className="relative group">
-                          <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
-                            {file.type.startsWith('image/') ? (
-                              <Image className="w-8 h-8 text-muted-foreground" />
-                            ) : (
-                              <Video className="w-8 h-8 text-muted-foreground" />
-                            )}
+                          <div className="aspect-square bg-secondary/50 border border-border/50 rounded-xl p-4 flex flex-col items-center justify-center hover:bg-secondary/70 transition-colors">
+                            <div className="p-2 bg-primary/10 rounded-lg mb-2">
+                              {file.type.startsWith('image/') ? (
+                                <Image className="w-6 h-6 text-primary" />
+                              ) : (
+                                <Video className="w-6 h-6 text-accent" />
+                              )}
+                            </div>
+                            <div className="text-center">
+                              <p className="text-xs font-medium text-foreground/80 mb-1">
+                                {file.type.startsWith('image/') ? 'Image' : 'Video'}
+                              </p>
+                              <p className="text-xs text-muted-foreground">{(file.size / 1024 / 1024).toFixed(1)}MB</p>
+                            </div>
                           </div>
                           <button
-                            onClick={() => removeMediaFile(index)}
-                            className="absolute -top-2 -right-2 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeMediaFile(index);
+                            }}
+                            className="absolute -top-2 -right-2 w-7 h-7 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 shadow-lg"
                           >
                             ×
                           </button>
-                          <p className="text-xs text-muted-foreground mt-1 truncate">
-                            {file.name}
-                          </p>
+                          <div className="mt-2">
+                            <p className="text-xs text-muted-foreground truncate font-medium">
+                              {file.name}
+                            </p>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -630,69 +672,113 @@ Example: 'I'm launching a productivity app that helps remote workers stay focuse
             </Card>
 
             {/* Generate Button */}
-            <div className="text-center">
-              <Button
-                onClick={generateRefinedPrompts}
-                disabled={!state.coreIdea.trim() || state.isLoading}
-                size="lg"
-                className="px-8 py-3 text-lg font-medium glow-primary"
-              >
-                {state.isLoading ? (
-                  <>
-                    <div className="loading-dots mr-2">
-                      <span style={{ '--i': 0 } as React.CSSProperties}></span>
-                      <span style={{ '--i': 1 } as React.CSSProperties}></span>
-                      <span style={{ '--i': 2 } as React.CSSProperties}></span>
-                    </div>
-                    Generating Refined Prompts...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-5 h-5 mr-2" />
-                    Generate Refined Prompts
-                  </>
+            <div className="text-center py-8">
+              <div className="relative inline-block">
+                <Button
+                  onClick={generateRefinedPrompts}
+                  disabled={!state.coreIdea.trim() || state.isLoading}
+                  size="lg"
+                  className="px-12 py-4 text-lg font-semibold bg-gradient-primary hover:opacity-90 border-0 shadow-glow relative overflow-hidden group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                  {state.isLoading ? (
+                    <>
+                      <div className="loading-dots mr-3">
+                        <span style={{ '--i': 0 } as React.CSSProperties}></span>
+                        <span style={{ '--i': 1 } as React.CSSProperties}></span>
+                        <span style={{ '--i': 2 } as React.CSSProperties}></span>
+                      </div>
+                      Generating Refined Prompts...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-6 h-6 mr-3" />
+                      Generate Refined Prompts
+                    </>
+                  )}
+                </Button>
+                {!state.isLoading && (
+                  <div className="absolute -inset-1 bg-gradient-primary rounded-lg blur opacity-30 group-hover:opacity-50 transition-opacity -z-10"></div>
                 )}
-              </Button>
+              </div>
+              <p className="text-sm text-muted-foreground mt-4 max-w-md mx-auto">
+                Click to start the AI refinement process. This will analyze your input and create optimized prompts.
+              </p>
             </div>
           </div>
         )}
 
         {/* Step 2: Prompt Refinement */}
         {state.step === 'refinement' && (
-          <div className="space-y-6 animate-fade-in">
-            <Card className="step-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5" />
+          <div className="space-y-8 animate-fade-in">
+            <Card className="step-card border-primary/20 relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-primary"></div>
+              <CardHeader className="pb-6">
+                <CardTitle className="flex items-center gap-3 text-xl">
+                  <div className="p-3 bg-primary/10 rounded-xl">
+                    <Sparkles className="w-6 h-6 text-primary" />
+                  </div>
                   Select Your Refined Prompt
+                  <div className="ml-auto px-3 py-1 bg-accent/20 text-accent text-xs font-semibold rounded-full">
+                    STEP 2 OF 4
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground mb-6">
-                  Our AI has refined your idea into three optimized prompts. Choose the one that best captures your vision:
-                </p>
-                <div className="space-y-4">
-                  {state.refinedPrompts.map((prompt) => (
+                <div className="mb-8">
+                  <p className="text-muted-foreground text-lg leading-relaxed">
+                    Our AI has refined your idea into three optimized prompts. Choose the one that best captures your vision:
+                  </p>
+                </div>
+                <div className="space-y-6">
+                  {state.refinedPrompts.map((prompt, index) => (
                     <Card
                       key={prompt.id}
-                      className={`cursor-pointer transition-all duration-200 hover:shadow-medium ${
+                      className={`cursor-pointer transition-all duration-300 hover:scale-[1.01] border-2 relative overflow-hidden group ${
                         state.selectedPrompt === prompt.text
-                          ? 'border-primary bg-primary/5'
-                          : 'hover:border-primary/50'
+                          ? 'border-primary bg-primary/5 shadow-glow'
+                          : 'border-border/50 hover:border-primary/30 hover:shadow-lg'
                       }`}
                       onClick={() => selectRefinedPrompt(prompt.id)}
                     >
-                      <CardContent className="p-4">
-                        <div className="flex items-start space-x-3">
-                          <div className="w-6 h-6 rounded-full border-2 border-primary flex items-center justify-center flex-shrink-0 mt-1">
-                            <div className="w-3 h-3 rounded-full bg-primary"></div>
+                      {state.selectedPrompt === prompt.text && (
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5"></div>
+                      )}
+                      <CardContent className="p-6 relative z-10">
+                        <div className="flex items-start space-x-4">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-lg border-2 transition-colors ${
+                            state.selectedPrompt === prompt.text
+                              ? 'bg-primary text-primary-foreground border-primary'
+                              : 'bg-secondary border-border text-muted-foreground group-hover:border-primary/50'
+                          }`}>
+                            {index + 1}
                           </div>
-                          <p className="text-sm leading-relaxed">{prompt.text}</p>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-3">
+                              <span className="text-sm font-semibold text-primary">Refined Prompt {index + 1}</span>
+                              {state.selectedPrompt === prompt.text && (
+                                <Check className="w-4 h-4 text-primary animate-scale-in" />
+                              )}
+                            </div>
+                            <p className="text-sm leading-relaxed text-foreground/90">{prompt.text}</p>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
                   ))}
                 </div>
+                {state.selectedPrompt && (
+                  <div className="mt-8 text-center animate-slide-up">
+                    <Button
+                      onClick={() => setState(prev => ({ ...prev, step: 'generation' }))}
+                      size="lg"
+                      className="px-8 py-3 bg-gradient-primary hover:opacity-90 shadow-lg"
+                    >
+                      <Wand2 className="w-5 h-5 mr-2" />
+                      Continue to Generation
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -700,56 +786,91 @@ Example: 'I'm launching a productivity app that helps remote workers stay focuse
 
         {/* Step 3: Generation */}
         {state.step === 'generation' && (
-          <div className="space-y-6 animate-fade-in">
-            <Card className="step-card">
-              <CardHeader>
-                <CardTitle>Ready to Generate Captions</CardTitle>
+          <div className="space-y-8 animate-fade-in">
+            <Card className="step-card border-primary/20 relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-primary"></div>
+              <CardHeader className="pb-6">
+                <CardTitle className="flex items-center gap-3 text-xl">
+                  <div className="p-3 bg-primary/10 rounded-xl">
+                    <Wand2 className="w-6 h-6 text-primary" />
+                  </div>
+                  Ready to Generate Captions
+                  <div className="ml-auto px-3 py-1 bg-accent/20 text-accent text-xs font-semibold rounded-full">
+                    STEP 3 OF 4
+                  </div>
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="p-4 bg-muted rounded-lg">
-                    <p className="text-sm font-medium mb-2">Selected Prompt:</p>
-                    <p className="text-sm text-muted-foreground">{state.selectedPrompt}</p>
-                  </div>
-                  <div className="p-4 bg-muted rounded-lg">
-                    <p className="text-sm font-medium mb-2">Target Platforms:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {state.selectedPlatforms.map(platformId => {
-                        const platform = PLATFORMS.find(p => p.id === platformId);
-                        return (
-                          <span
-                            key={platformId}
-                            className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm"
-                          >
-                            {platform?.icon} {platform?.name}
-                          </span>
-                        );
-                      })}
+                <div className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="p-4 bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-xl">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Sparkles className="w-4 h-4 text-primary" />
+                          <p className="text-sm font-semibold text-primary">Selected Prompt:</p>
+                        </div>
+                        <p className="text-sm text-foreground/80 leading-relaxed bg-background/50 p-3 rounded-lg border">
+                          {state.selectedPrompt}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="p-4 bg-gradient-to-br from-accent/5 to-accent/10 border border-accent/20 rounded-xl">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Check className="w-4 h-4 text-accent" />
+                          <p className="text-sm font-semibold text-accent">Target Platforms:</p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {state.selectedPlatforms.map(platformId => {
+                            const platform = PLATFORMS.find(p => p.id === platformId);
+                            return (
+                              <span
+                                key={platformId}
+                                className="px-3 py-1.5 bg-background/70 border border-border/50 text-foreground rounded-lg text-sm font-medium flex items-center gap-1.5"
+                              >
+                                <span>{platform?.icon}</span>
+                                {platform?.name}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="text-center pt-4">
-                    <Button
-                      onClick={generateCaptions}
-                      disabled={state.isLoading}
-                      size="lg"
-                      className="px-8 py-3 text-lg font-medium glow-primary"
-                    >
-                      {state.isLoading ? (
-                        <>
-                          <div className="loading-dots mr-2">
-                            <span style={{ '--i': 0 } as React.CSSProperties}></span>
-                            <span style={{ '--i': 1 } as React.CSSProperties}></span>
-                            <span style={{ '--i': 2 } as React.CSSProperties}></span>
-                          </div>
-                          Generating Captions...
-                        </>
-                      ) : (
-                        <>
-                          <Wand2 className="w-5 h-5 mr-2" />
-                          Generate Captions
-                        </>
+                  
+                  <div className="text-center pt-6">
+                    <div className="relative inline-block">
+                      <Button
+                        onClick={generateCaptions}
+                        disabled={state.isLoading}
+                        size="lg"
+                        className="px-12 py-4 text-lg font-semibold bg-gradient-primary hover:opacity-90 border-0 shadow-glow relative overflow-hidden group"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                        {state.isLoading ? (
+                          <>
+                            <div className="loading-dots mr-3">
+                              <span style={{ '--i': 0 } as React.CSSProperties}></span>
+                              <span style={{ '--i': 1 } as React.CSSProperties}></span>
+                              <span style={{ '--i': 2 } as React.CSSProperties}></span>
+                            </div>
+                            Generating Captions...
+                          </>
+                        ) : (
+                          <>
+                            <Wand2 className="w-6 h-6 mr-3" />
+                            Generate Captions
+                          </>
+                        )}
+                      </Button>
+                      {!state.isLoading && (
+                        <div className="absolute -inset-1 bg-gradient-primary rounded-lg blur opacity-30 group-hover:opacity-50 transition-opacity -z-10"></div>
                       )}
-                    </Button>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-4 max-w-md mx-auto">
+                      This will generate 5 unique captions for each selected platform using your refined prompt.
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -759,20 +880,31 @@ Example: 'I'm launching a productivity app that helps remote workers stay focuse
 
         {/* Step 4: Output */}
         {state.step === 'output' && (
-          <div className="space-y-6 animate-fade-in">
+          <div className="space-y-8 animate-fade-in">
             {/* Controls */}
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Generated Captions</h2>
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 bg-gradient-to-r from-primary/5 to-accent/5 rounded-xl border border-primary/20">
+              <div>
+                <h2 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
+                  Generated Captions
+                </h2>
+                <p className="text-muted-foreground">
+                  Your AI-generated captions are ready! Copy individual captions or download all at once.
+                </p>
+              </div>
               <div className="flex gap-3">
                 <Button
                   onClick={regenerateCaptions}
                   disabled={state.isLoading}
                   variant="outline"
+                  className="border-primary/30 hover:bg-primary/10"
                 >
                   <RefreshCw className={`w-4 h-4 mr-2 ${state.isLoading ? 'animate-spin' : ''}`} />
                   Regenerate
                 </Button>
-                <Button onClick={downloadCaptions} variant="outline">
+                <Button 
+                  onClick={downloadCaptions} 
+                  className="bg-gradient-primary hover:opacity-90 shadow-lg"
+                >
                   <Download className="w-4 h-4 mr-2" />
                   Download All
                 </Button>
@@ -780,43 +912,56 @@ Example: 'I'm launching a productivity app that helps remote workers stay focuse
             </div>
 
             {/* Caption Output */}
-            <div className="space-y-6">
-              {state.generatedCaptions.map((platformOutput) => (
-                <Card key={platformOutput.platform} className="step-card">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-3">
-                      <span className="text-lg">
-                        {PLATFORMS.find(p => p.name === platformOutput.platform)?.icon}
-                      </span>
+            <div className="space-y-8">
+              {state.generatedCaptions.map((platformOutput, platformIndex) => (
+                <Card key={platformOutput.platform} className="step-card border-primary/20 relative overflow-hidden group">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent"></div>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center gap-3 text-xl">
+                      <div className="p-3 bg-primary/10 rounded-xl">
+                        <span className="text-2xl">
+                          {PLATFORMS.find(p => p.name === platformOutput.platform)?.icon}
+                        </span>
+                      </div>
                       {platformOutput.platform} Captions
+                      <div className="ml-auto px-3 py-1 bg-success/20 text-success text-xs font-semibold rounded-full">
+                        {platformOutput.captions.length} CAPTIONS
+                      </div>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="grid gap-4">
                       {platformOutput.captions.map((caption, index) => (
-                        <div key={index} className="caption-card group">
-                          <div className="flex items-start justify-between gap-3">
+                        <div key={index} className="group/caption relative overflow-hidden border border-border/50 rounded-xl p-5 bg-gradient-to-br from-background to-secondary/20 hover:shadow-lg transition-all duration-300 hover:border-primary/30">
+                          <div className="flex items-start justify-between gap-4">
                             <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <span className="text-sm font-medium text-primary">
+                              <div className="flex items-center gap-3 mb-3">
+                                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                                  <span className="text-sm font-bold text-primary">{index + 1}</span>
+                                </div>
+                                <span className="text-sm font-semibold text-primary">
                                   Caption {index + 1}
                                 </span>
+                                <div className="flex-1 h-px bg-border/30"></div>
                               </div>
-                              <p className="text-sm leading-relaxed">{caption}</p>
+                              <p className="text-sm leading-relaxed text-foreground/90 font-medium">
+                                {caption}
+                              </p>
                             </div>
                             <Button
                               onClick={() => copyCaption(caption, `${platformOutput.platform}-${index}`)}
                               variant="ghost"
                               size="sm"
-                              className="opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="opacity-0 group-hover/caption:opacity-100 transition-all duration-200 hover:bg-primary/10 hover:scale-110"
                             >
                               {copiedCaption === `${platformOutput.platform}-${index}` ? (
                                 <Check className="w-4 h-4 text-success" />
                               ) : (
-                                <Copy className="w-4 h-4" />
+                                <Copy className="w-4 h-4 text-primary" />
                               )}
                             </Button>
                           </div>
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent opacity-0 group-hover/caption:opacity-100 transition-opacity pointer-events-none"></div>
                         </div>
                       ))}
                     </div>
