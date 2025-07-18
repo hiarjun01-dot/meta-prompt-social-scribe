@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { Upload, FileText, Image, Video, Sparkles, Download, RefreshCw, Copy, Check, AlertCircle, Bot, Wand2 } from 'lucide-react';
+import { Upload, FileText, Image, Video, Sparkles, Download, RefreshCw, Copy, Check, AlertCircle, Bot, Wand2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -239,6 +239,16 @@ const CaptionCraft: React.FC = () => {
     
     toast.success('Captions downloaded successfully!');
   }, [state.generatedCaptions]);
+
+  // Navigation functions
+  const goToPreviousStep = useCallback(() => {
+    const steps = ['input', 'refinement', 'generation', 'output'];
+    const currentIndex = steps.indexOf(state.step);
+    if (currentIndex > 0) {
+      const previousStep = steps[currentIndex - 1] as WorkflowState['step'];
+      setState(prev => ({ ...prev, step: previousStep }));
+    }
+  }, [state.step]);
 
 return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -711,6 +721,16 @@ Example: 'I am launching a productivity app that helps remote workers stay focus
         {/* Step 2: Prompt Refinement */}
         {state.step === 'refinement' && (
           <div className="space-y-8 animate-fade-in">
+            {/* Back Button */}
+            <Button
+              variant="ghost"
+              onClick={goToPreviousStep}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Setup
+            </Button>
+
             <Card className="step-card border-primary/20 relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-primary"></div>
               <CardHeader className="pb-6">
@@ -787,6 +807,16 @@ Example: 'I am launching a productivity app that helps remote workers stay focus
         {/* Step 3: Generation */}
         {state.step === 'generation' && (
           <div className="space-y-8 animate-fade-in">
+            {/* Back Button */}
+            <Button
+              variant="ghost"
+              onClick={goToPreviousStep}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Refinement
+            </Button>
+
             <Card className="step-card border-primary/20 relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-primary"></div>
               <CardHeader className="pb-6">
@@ -881,6 +911,16 @@ Example: 'I am launching a productivity app that helps remote workers stay focus
         {/* Step 4: Output */}
         {state.step === 'output' && (
           <div className="space-y-8 animate-fade-in">
+            {/* Back Button */}
+            <Button
+              variant="ghost"
+              onClick={goToPreviousStep}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Generation
+            </Button>
+
             {/* Controls */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 bg-gradient-to-r from-primary/5 to-accent/5 rounded-xl border border-primary/20">
               <div>
