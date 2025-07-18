@@ -240,59 +240,107 @@ const CaptionCraft: React.FC = () => {
     toast.success('Captions downloaded successfully!');
   }, [state.generatedCaptions]);
 
-  return (
-    <div className="min-h-screen bg-background">
+return (
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 bg-gradient-glow opacity-30 animate-glow-pulse" />
+      <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
+      
       {/* Header */}
-      <div className="border-b border-border bg-gradient-primary">
-        <div className="container mx-auto px-6 py-8">
+      <div className="relative border-b border-border/50 bg-gradient-primary backdrop-blur-sm">
+        <div className="container mx-auto px-6 py-12">
           <div className="text-center">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm">
-                <Wand2 className="w-8 h-8 text-white" />
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <div className="relative p-4 bg-white/20 rounded-xl backdrop-blur-md border border-white/30 shadow-glow">
+                <Sparkles className="w-10 h-10 text-white animate-pulse" />
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-accent rounded-full animate-bounce" />
               </div>
-              <h1 className="text-4xl font-bold text-white">CaptionCraft</h1>
+              <div>
+                <h1 className="text-5xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                  CaptionCraft
+                </h1>
+                <div className="flex items-center justify-center gap-2 mt-1">
+                  <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse" />
+                  <span className="text-sm text-white/70 font-medium tracking-wide">AI POWERED</span>
+                  <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse" />
+                </div>
+              </div>
             </div>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              AI-powered social media caption generator with intelligent meta-prompting workflow
+            <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+              Transform your ideas into <span className="font-semibold text-white">engaging social media captions</span> with our intelligent meta-prompting workflow
             </p>
+            <div className="flex items-center justify-center gap-6 mt-6 text-white/80">
+              <div className="flex items-center gap-2">
+                <Bot className="w-4 h-4" />
+                <span className="text-sm">Smart AI</span>
+              </div>
+              <div className="w-1 h-1 bg-white/40 rounded-full" />
+              <div className="flex items-center gap-2">
+                <Wand2 className="w-4 h-4" />
+                <span className="text-sm">Meta-Prompting</span>
+              </div>
+              <div className="w-1 h-1 bg-white/40 rounded-full" />
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4" />
+                <span className="text-sm">Multi-Platform</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-6 py-8 max-w-4xl">
+      <div className="relative container mx-auto px-6 py-12 max-w-5xl">
         {/* Progress Indicator */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            {['Input', 'Refinement', 'Generation', 'Output'].map((step, index) => (
-              <div
-                key={step}
-                className={`flex items-center gap-2 ${
-                  ['input', 'refinement', 'generation', 'output'].indexOf(state.step) >= index
-                    ? 'text-primary'
-                    : 'text-muted-foreground'
-                }`}
-              >
+        <div className="mb-12">
+          <div className="flex items-center justify-between mb-6 relative">
+            {['Input', 'Refinement', 'Generation', 'Output'].map((step, index) => {
+              const isActive = ['input', 'refinement', 'generation', 'output'].indexOf(state.step) >= index;
+              const isCurrent = ['input', 'refinement', 'generation', 'output'].indexOf(state.step) === index;
+              
+              return (
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                    ['input', 'refinement', 'generation', 'output'].indexOf(state.step) >= index
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground'
+                  key={step}
+                  className={`flex flex-col items-center gap-3 relative z-10 ${
+                    isActive ? 'text-primary' : 'text-muted-foreground'
                   }`}
                 >
-                  {index + 1}
+                  <div
+                    className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 shadow-lg ${
+                      isCurrent
+                        ? 'bg-primary text-primary-foreground scale-110 shadow-glow animate-glow-pulse'
+                        : isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-secondary border-2 border-border text-muted-foreground'
+                    }`}
+                  >
+                    {isActive ? (
+                      <Sparkles className="w-5 h-5" />
+                    ) : (
+                      index + 1
+                    )}
+                  </div>
+                  <span className={`font-semibold text-sm ${isCurrent ? 'text-primary' : ''}`}>
+                    {step}
+                  </span>
                 </div>
-                <span className="font-medium">{step}</span>
-              </div>
-            ))}
+              );
+            })}
+            
+            {/* Connecting Line */}
+            <div className="absolute top-6 left-6 right-6 h-0.5 bg-border -z-10" />
           </div>
-          <div className="w-full bg-muted rounded-full h-2">
+          
+          <div className="relative w-full bg-secondary/50 rounded-full h-3 overflow-hidden border border-border/50">
             <div
-              className="bg-primary h-2 rounded-full transition-all duration-300"
+              className="bg-gradient-primary h-full rounded-full transition-all duration-500 ease-out relative"
               style={{
                 width: `${((['input', 'refinement', 'generation', 'output'].indexOf(state.step) + 1) / 4) * 100}%`
               }}
-            />
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
+            </div>
           </div>
         </div>
 
@@ -306,56 +354,88 @@ const CaptionCraft: React.FC = () => {
 
         {/* Step 1: Input */}
         {state.step === 'input' && (
-          <div className="space-y-6 animate-fade-in">
+          <div className="space-y-8 animate-fade-in">
             {/* API Key Input */}
-            <Card className="step-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bot className="w-5 h-5" />
+            <Card className="step-card group hover:shadow-glow transition-all duration-300 border-primary/20">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-lg">
+                  <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                    <Bot className="w-5 h-5 text-primary" />
+                  </div>
                   LLM API Configuration
+                  <div className="ml-auto px-3 py-1 bg-accent/20 text-accent text-xs font-semibold rounded-full">
+                    SECURE
+                  </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <Label htmlFor="apiKey">API Key (OpenAI, Anthropic, or Google)</Label>
-                  <Input
-                    id="apiKey"
-                    type="password"
-                    placeholder="sk-..."
-                    value={state.apiKey}
-                    onChange={(e) => setState(prev => ({ ...prev, apiKey: e.target.value }))}
-                    className="font-mono"
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Your API key is used securely and never stored permanently
-                  </p>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <Label htmlFor="apiKey" className="text-sm font-medium flex items-center gap-2">
+                    API Key (OpenAI, Anthropic, or Google)
+                    <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="apiKey"
+                      type="password"
+                      placeholder="sk-..."
+                      value={state.apiKey}
+                      onChange={(e) => setState(prev => ({ ...prev, apiKey: e.target.value }))}
+                      className="font-mono pr-12 border-border/50 focus:border-primary/50 transition-colors"
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      {state.apiKey && <Check className="w-4 h-4 text-success" />}
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg border border-border/30">
+                    <AlertCircle className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-muted-foreground">
+                      Your API key is used securely and never stored permanently. We use client-side encryption.
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Product Context Upload */}
-            <Card className="step-card">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
+            <Card className="step-card group hover:shadow-glow transition-all duration-300 border-primary/20">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-lg">
+                  <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                    <FileText className="w-5 h-5 text-primary" />
+                  </div>
                   Product/Brand Context
+                  <div className="ml-auto px-3 py-1 bg-secondary text-secondary-foreground text-xs font-semibold rounded-full">
+                    OPTIONAL
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div
-                    className="upload-zone"
+                    className={`upload-zone relative overflow-hidden group/upload transition-all duration-300 ${
+                      state.productContext ? 'upload-zone-active border-success' : ''
+                    }`}
                     onClick={() => contextFileRef.current?.click()}
                   >
-                    <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-lg font-medium mb-2">Upload Context Document</p>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Upload a .txt, .md, or .pdf file with your product/brand information
-                    </p>
-                    <Button variant="outline" size="sm">
-                      <Upload className="w-4 h-4 mr-2" />
-                      Choose File
-                    </Button>
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover/upload:opacity-100 transition-opacity" />
+                    <div className="relative z-10">
+                      {state.productContext ? (
+                        <Check className="w-12 h-12 mx-auto mb-4 text-success" />
+                      ) : (
+                        <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground group-hover/upload:text-primary transition-colors" />
+                      )}
+                      <p className="text-lg font-semibold mb-2">
+                        {state.productContext ? 'Context Loaded Successfully!' : 'Upload Context Document'}
+                      </p>
+                      <p className="text-sm text-muted-foreground mb-6">
+                        Upload a .txt, .md, or .pdf file with your product/brand information
+                      </p>
+                      <Button variant={state.productContext ? "default" : "outline"} size="sm" className="shadow-md">
+                        <Upload className="w-4 h-4 mr-2" />
+                        {state.productContext ? 'Change File' : 'Choose File'}
+                      </Button>
+                    </div>
                   </div>
                   <input
                     ref={contextFileRef}
@@ -365,10 +445,13 @@ const CaptionCraft: React.FC = () => {
                     className="hidden"
                   />
                   {state.productContext && (
-                    <div className="p-4 bg-muted rounded-lg">
-                      <p className="text-sm font-medium mb-2">Context loaded:</p>
-                      <p className="text-sm text-muted-foreground truncate">
-                        {state.productContext.substring(0, 100)}...
+                    <div className="p-4 bg-success/10 border border-success/20 rounded-lg animate-slide-up">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Check className="w-4 h-4 text-success" />
+                        <p className="text-sm font-semibold text-success">Context loaded successfully:</p>
+                      </div>
+                      <p className="text-sm text-muted-foreground bg-background/50 p-2 rounded border">
+                        {state.productContext.substring(0, 150)}...
                       </p>
                     </div>
                   )}
@@ -377,65 +460,108 @@ const CaptionCraft: React.FC = () => {
             </Card>
 
             {/* Platform Selection */}
-            <Card className="step-card">
-              <CardHeader>
-                <CardTitle>Target Platforms</CardTitle>
+            <Card className="step-card group hover:shadow-glow transition-all duration-300 border-primary/20">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-lg">
+                  <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                  </div>
+                  Target Platforms
+                  <div className="ml-auto px-3 py-1 bg-accent/20 text-accent text-xs font-semibold rounded-full">
+                    {state.selectedPlatforms.length} SELECTED
+                  </div>
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {PLATFORMS.map((platform) => (
-                    <div
-                      key={platform.id}
-                      className={`platform-card ${
-                        state.selectedPlatforms.includes(platform.id)
-                          ? 'platform-card-selected'
-                          : ''
-                      }`}
-                      onClick={() => togglePlatform(platform.id)}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <Checkbox
-                          checked={state.selectedPlatforms.includes(platform.id)}
-                          onChange={() => {}}
-                          className="pointer-events-none"
-                        />
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-lg">{platform.icon}</span>
-                            <span className="font-medium">{platform.name}</span>
+                  {PLATFORMS.map((platform) => {
+                    const isSelected = state.selectedPlatforms.includes(platform.id);
+                    return (
+                      <div
+                        key={platform.id}
+                        className={`relative overflow-hidden cursor-pointer transition-all duration-300 border-2 rounded-xl p-4 hover:scale-[1.02] hover:shadow-lg ${
+                          isSelected
+                            ? 'border-primary bg-primary/10 shadow-glow'
+                            : 'border-border/50 bg-card hover:border-primary/30 hover:bg-primary/5'
+                        }`}
+                        onClick={() => togglePlatform(platform.id)}
+                      >
+                        <div className="flex items-center space-x-3 relative z-10">
+                          <Checkbox
+                            checked={isSelected}
+                            onChange={() => {}}
+                            className="pointer-events-none"
+                          />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-xl">{platform.icon}</span>
+                              <span className="font-semibold">{platform.name}</span>
+                              {isSelected && (
+                                <Check className="w-4 h-4 text-primary ml-auto" />
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              {platform.description}
+                            </p>
                           </div>
-                          <p className="text-sm text-muted-foreground">
-                            {platform.description}
-                          </p>
                         </div>
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 pointer-events-none" />
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
+                {state.selectedPlatforms.length === 0 && (
+                  <div className="mt-4 p-3 bg-warning/10 border border-warning/20 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-warning" />
+                      <p className="text-sm text-warning font-medium">
+                        Please select at least one platform to continue
+                      </p>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
             {/* Core Idea Input */}
-            <Card className="step-card">
-              <CardHeader>
-                <CardTitle>Core Idea</CardTitle>
+            <Card className="step-card group hover:shadow-glow transition-all duration-300 border-primary/20">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-3 text-lg">
+                  <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                    <Wand2 className="w-5 h-5 text-primary" />
+                  </div>
+                  Core Idea
+                  <span className="text-destructive text-lg">*</span>
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
-                  <Label htmlFor="coreIdea">
+                <div className="space-y-4">
+                  <Label htmlFor="coreIdea" className="text-sm font-medium">
                     Describe your product, campaign, or content idea
                   </Label>
-                  <Textarea
-                    id="coreIdea"
-                    placeholder="Enter your raw thoughts, keywords, or basic draft for the post..."
-                    value={state.coreIdea}
-                    onChange={(e) => setState(prev => ({ ...prev, coreIdea: e.target.value }))}
-                    rows={6}
-                    className="resize-none"
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Be as detailed or as brief as you like - our AI will help refine your ideas
-                  </p>
+                  <div className="relative">
+                    <Textarea
+                      id="coreIdea"
+                      placeholder="Enter your raw thoughts, keywords, or basic draft for the post... 
+
+Example: 'I'm launching a productivity app that helps remote workers stay focused. It has features like time blocking, distraction blocking, and team collaboration tools. I want to target young professionals who work from home.'"
+                      value={state.coreIdea}
+                      onChange={(e) => setState(prev => ({ ...prev, coreIdea: e.target.value }))}
+                      rows={8}
+                      className="resize-none border-border/50 focus:border-primary/50 transition-colors text-sm leading-relaxed"
+                    />
+                    <div className="absolute bottom-3 right-3 text-xs text-muted-foreground">
+                      {state.coreIdea.length} characters
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                    <Sparkles className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-muted-foreground">
+                      <span className="font-medium text-primary">Pro tip:</span> Be as detailed or as brief as you like - our AI will help refine your ideas into compelling captions that resonate with your audience.
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
